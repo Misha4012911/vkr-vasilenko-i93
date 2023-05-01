@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Корзина товаров{% endblock %}
+{% block content %}
+<body>
+  <h1>Корзина товаров</h1>
+  <table>
+    <thead>
+      <tr>
+        <th>Название товара</th>
+        <th>Размер</th>
+        <th>Количество</th>
+        <th>Цена</th>
+        <th>Сумма</th>
+        <th>Наличие</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in cart_items %}
+        <tr>
+          <td><a href="{{ url_for('product', product_id=item.product_id) }}">
+            {{ item.product_brand }} {{ item.product_name }}
+          </a></td>
+          <td>{{ item.size }}</td>
+          <td>
+            <form action="{{ url_for('decrease_cart_item_quantity', cart_id=item.id) }}" method="post" style="display: inline-block;">
+              <input type="hidden" name="_method" value="decrease">
+              <button type="submit">-</button>
+            </form>
+            {{ item.quantity }}
+            <form action="{{ url_for('increase_cart_item_quantity', cart_id=item.id) }}" method="post" style="display: inline-block;">
+              <input type="hidden" name="_method" value="increase">
+              <button type="submit">+</button>
+            </form>
+          </td>
+          <td>{{ item.price }}</td>
+          <td>{{ item.price * item.quantity }}</td>
+          <td>
+            {% set available_items_count = count_available_items(size=item.size, item_id=item.product_id) %}
+            {% if available_items_count >= item.quantity %}
+              Да, {{ available_items_count }} шт.
+            {% else %}
+              На складе всего {{ available_items_count }} шт 
+            {% endif %}
+          </td>
+          <td><form action="{{ url_for('remove_from_cart', cart_id=item.id) }}" method="post">
+                  <input type="hidden" name="_method" value="delete">
+                  <button type="submit">Удалить</button>
+              </form>
+          </td>
+        </tr>
+      {% endfor %}
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>Общая стоимость:</td>
+        <td>{{total}} руб.</td>
+        <td>
+          {% if cart_items and all_available %}
+            <a href="{{ url_for('add_order') }}" class="btn btn-primary">Оформить заказ</a>
+          {% else %}
+            <p>Корзина пуста или не все товары доступны.</p>
+          {% endif %}
+        </td>
+      </tr>
+    </tfoot>
+  </table>
+</body>
+{% endblock %}

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Оформление заказа</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+    
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+
+    <body>
+    <h1>Оформление заказа</h1>
+    {% if error %}
+      <p class="error-message">{{ error }}</p>
+    {% endif %}
+    <form method="POST" action="{{ url_for('add_order') }}">
+        <div class="form-group">
+          <label for="phone">Телефон</label>
+          <input type="text" class="form-control" id="phone" name="phone" required>
+          <!-- <p>Ваш город: <span id="city"></span></p> -->
+          <label for="addres">Адрес</label>
+          <input type="text" class="form-control" id="addres" name="addres" required>
+          <label for="addres">Квартира</label>
+          <input type="text" class="form-control" id="apart" name="apart" required>
+          <div id="mapid"></div>
+        </div>
+        <button type="submit" class="btn btn-primary">Оформить заказ</button>
+    </form>
+
+    
+
+    <script>
+      var map = L.map('mapid').setView([55.028554, 82.920532], 13);
+      var previousMarker = null;
+      
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+      }).addTo(map);
+
+      // Получаем координаты местоположения пользователя
+      if ('geolocation' in navigator) {
+          navigator.geolocation.getCurrentPosition(function(position) {
+              var lat = position.coords.latitude;
+              var lon = position.coords.longitude;
+
+              // Получаем информацию о городе по координатам
+              var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + lat + '&lon=' + lon + '&zoom=10';
+              fetch(url)
+                  .then(function(response) {
+                      return response.json();
+                  })
+                  .then(function(data) {
+                      // Выводим информацию о городе
+                      var city = data.address.city || data.address.town || data.address.village || data.address.hamlet || data.address.locality || data.address.suburb || data.address.district || data.address.county || data.address.region || data.address.state || data.address.country;
+                      // document.getElementById('city').textContent = city;
+
+                      // Показываем местоположение пользователя на карте
+                      L.marker([lat, lon]).addTo(map)
+                          .bindPopup('Вы здесь: ' + city)
+                          .openPopup();
+                      map.setView([lat, lon], 13);
+                  })
+                  .catch(function(error) {
+                      console.log('Ошибка получения города: ' + error.message);
+                  });
+          }, function(error) {
+              console.log('Ошибка получения местоположения: ' + error.message);
+          });
+      } else {
+          console.log('Geolocation не поддерживается браузером');
+      }
+
+
+      function onMapClick(e) {
+          // Удаляем предыдущий адрес, если он существует
+          document.getElementById('addres').value = '';
+
+          // Удаляем предыдущую метку, если она существует
+          if (previousMarker) {
+              map.removeLayer(previousMarker);
+          }
+
+          // Декодируем координаты местоположения в текстовый адрес
+          var url = 'https://nominatim.openstreetmap.org/reverse?format=json&lat=' + e.latlng.lat + '&lon=' + e.latlng.lng;
+          fetch(url)
+              .then(function(response) {
+                  return response.json();
+              })
+              .then(function(data) {
+                  // Выводим текстовый адрес в поле "Адрес"
+                  document.getElementById('addres').value = data.display_name;
+              })
+              .catch(function(error) {
+                  console.log('Ошибка получения адреса: ' + error.message);
+              });
+
+          // Добавляем маркер на карту
+          var marker = L.marker(e.latlng).addTo(map);
+          previousMarker = marker;
+
+      }
+
+      map.on('click', onMapClick);
+    </script>
+  </body>
+</html>

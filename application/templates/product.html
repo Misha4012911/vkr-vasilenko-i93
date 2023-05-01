@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ product.name }}{% endblock %}
+{% block content %}
+<body>
+  <div class="product-page">
+  <img src="{{ product.img_url }}">
+  <h2>{{ product.category }} {{ product.brand }} {{ product.name }} {{ product.color}}</h2>
+  <p>{{ product.description }}</p>
+  <p>Цена: {{ product.price }} руб.</p>
+  {% if size_lst %}
+    <form method="POST" action="{{ url_for('add_to_cart') }}">
+      <input type="hidden" name="prod_price" value="{{ product.price }}">
+      <input type="hidden" name="prod_name" value="{{ product.name }}">
+      <input type="hidden" name="prod_brand" value="{{ product.brand }}">
+      <input type="hidden" name="prod_id" value="{{ product.id }}">
+      <label for="size">Размеры в наличии:</label>
+        {% for size in size_lst %}
+          <label>
+            <input type="radio" name="size_inf" value="{{ size }}" required>
+            {{ size }}
+          </label>
+        {% endfor %}
+      
+        </br>
+      <label>количество</label>
+      <input type="number" name="quantity_inf" value="1" min="1" max="10">
+      <button type="submit" {% if not size_lst %}disabled{% endif %}>Добавить в корзину</button>
+    </form>
+  {% else %}
+        <p>Товара нет в наличии</p>
+  {% endif %}
+  </div>
+
+</body>
+{% endblock %}

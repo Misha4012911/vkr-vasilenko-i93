@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+
+{% block title %}Товары{% endblock %}
+
+{% block content %}
+<body>
+    <h1 id="product-title">Товары</h1>
+    
+    <div class="product-wrapper">
+        <!-- Your product cards here -->
+    {% for product in products %}
+        <a href="{{ url_for('product', product_id=product.id) }}">
+        <div class="product-card">
+        <img src="{{ product.img_url }}">
+        <h2>{{ product.category }} {{ product.brand }} {{ product.name }} {{ product.color}}</h2>
+        <p>Цена: {{ product.price }} руб.</p>
+        </div>
+        </a>
+    {% endfor %}
+    </div>
+    
+</body>
+{% endblock %}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Авторизация</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style2.css') }}">
+  </head>
+  <body>
+    <h1>Авторизация</h1>
+    {% if error %}
+      <p>{{ error }}</p>
+    {% endif %}
+    <form method="post" id="login-form">
+      <label for="login">Логин:</label>
+      <input type="text" name="login" id="login" required>
+      <br>
+      <label for="password">Пароль:</label>
+      <input type="password" name="password" id="password" required>
+      <br>
+      <button type="submit" id="login-button">Войти</button>
+    </form>
+    <div id="notification"></div>
+    <script>
+      var form = document.getElementById("login-form");
+      var button = document.getElementById("login-button");
+      var notification = document.getElementById("notification");
+
+      form.addEventListener("submit", function(event) {
+        // Отменяем стандартное поведение формы
+        event.preventDefault();
+
+        // Проверяем логин и пароль
+        var login = document.getElementById("login").value;
+        var password = document.getElementById("password").value;
+
+        if (login == "" || password == "") {
+          notification.innerHTML = "Пожалуйста, заполните все поля";
+          notification.style.backgroundColor = "#f44336";
+          notification.style.display = "block";
+        } else {
+          form.submit();
+        }
+      });
+    </script>
+  </body>
+</html>

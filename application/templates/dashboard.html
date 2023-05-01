@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block title %}Личный кабинет{% endblock %}
+
+{% block content %}
+  <h1>Личный кабинет</h1>
+  <p>Добро пожаловать, {{ current_user.name }}!</p>
+  <ul>
+    <li>Логин: {{ current_user.login }}</li>
+    <li>Email: {{ current_user.email }}</li>
+  </ul>
+  {% if orders %}
+  <table>
+    <thead>
+      <tr>
+        <th>Дата заказа</th>
+        <th>Адрес </th>
+        <th>Сумма заказа </th>
+        <th>Статус заказа </th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for order in orders %}
+    <tr>
+      <td>{{ order.order_data }}</td>
+      <td>{{ order.addres }}</td>
+      <td>{{ order.check_sum }}</td>
+      <td>{{ order.status_name }}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p>У вас нет заказов.</p>
+  {% endif %}
+
+{% endblock %}

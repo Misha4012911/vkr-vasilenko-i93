@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+{% block title %}Товары{% endblock %}
+
+{% block content %}
+<style> 
+</style>
+<body>
+
+  <h1>Поиск товаров</h1>
+
+  <form action="{{ url_for('search') }}" method="GET">
+    <label for="category">Категория:</label>
+    <select id="category" name="category">
+      <option value="">Все категории</option>
+      {% for category in categorys %}
+        <option value="{{ category.name }}">{{ category.name }}</option>
+      {% endfor %}
+    </select>
+
+    <label for="brand">Брэнд:</label>
+    <select id="brand" name="brand">
+      <option value="">Все брэнды</option>
+      {% for brand in brands %}
+        <option value="{{ brand.name }}">{{ brand.name }}</option>
+      {% endfor %}
+    </select>
+
+    <button type="submit">Найти</button>
+  </form>
+
+
+    <div class="product-wrapper">
+      {% for product in products %}
+              <a href="{{ url_for('product', product_id=product.id) }}">
+              <div class="product-card">
+              <img src="{{ product.img_url }}">
+              <h2>{{ product.category }} {{ product.brand }} {{ product.name }} {{ product.color}}</h2>
+              <p>Цена: {{ product.price }} руб.</p>
+              </div>
+              </a>
+      {% endfor %}
+    </div>
+</body>
+{% endblock %}
