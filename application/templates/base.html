@@ -70,6 +70,7 @@
       .product-card {
         display: inline-block;
         width: 300px;
+        height: 320px;
         background-color: #fff;
         border-radius: 5px;
         box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
@@ -238,45 +239,29 @@
     </style>
   </head>
   <body>
+
     <nav>
       <ul>
         <li><a href="{{ url_for('index') }}">Главная</a></li>
           <form action="{{ url_for('search') }}" method="GET">
             <input type="text" name="query" placeholder="Поиск...">
+            
             <button type="submit">Найти</button>
           </form>
           <div class="userprofile">
             {% if current_user.is_authenticated %}
-                <a href="{{ url_for('cart') }}">Корзина</a> <a href="{{ url_for('dashboard') }}">{{ current_user.login }}</a> <a href="{{ url_for('logout') }}">Выйти</a>
+                <a href="{{ url_for('cart') }}">Корзина</a> 
+                <a href="{{ url_for('dashboard') }}">{{ current_user.login }}</a> 
+                <a href="{{ url_for('logout') }}">Выйти</a>
             
             {% else %}
-              <a href="{{ url_for('login') }}">Войти</a> или <a href="{{ url_for('register') }}">зарегистрироваться</a>
+              <a href="{{ url_for('login') }}">Войти</a> или 
+              <a href="{{ url_for('register') }}">зарегистрироваться</a>
             {% endif %}
           </div>
         </ul>
-
-        
-        
-
-        <!-- <div class="userprofile">
-          <h1>{% if current_user.is_authenticated %}
-            Авторизованный пользователь:{{ current_user.login }}          
-          </h1>
-          <ul>
-            Привет {{ current_user.name }}!
-            <li><a href="{{ url_for('dashboard') }}">Личный кабинет</a></li>
-            <li><a href="{{ url_for('cart') }}">Корзина</a></li>
-            <li><a href="{{ url_for('logout') }}">Выйти</a></li>
-            {% else %}
-            Пожалуйста авторизуйтесь
-            <li><a href="{{ url_for('login') }}">Войти</a></li>
-            <li><a href="{{ url_for('register') }}">Зарегистрироваться</a></li>
-            {% endif %}
-          </ul>
-          </div> -->
-
       </ul>
-    </nav>
+    </nav> 
     {% block content %}{% endblock %}
   </body>
 </html>

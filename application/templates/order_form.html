@@ -51,7 +51,10 @@
                   })
                   .then(function(data) {
                       // Выводим информацию о городе
-                      var city = data.address.city || data.address.town || data.address.village || data.address.hamlet || data.address.locality || data.address.suburb || data.address.district || data.address.county || data.address.region || data.address.state || data.address.country;
+                      var city = data.address.city || data.address.town || data.address.village 
+                      || data.address.hamlet || data.address.locality || data.address.suburb 
+                      || data.address.district || data.address.county || data.address.region 
+                      || data.address.state || data.address.country;
                       // document.getElementById('city').textContent = city;
 
                       // Показываем местоположение пользователя на карте

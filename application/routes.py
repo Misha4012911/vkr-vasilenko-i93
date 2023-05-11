@@ -1,13 +1,15 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, Blueprint
 from flask_login import login_user, logout_user, login_required, current_user
 from flask_paginate import Pagination, get_page_parameter
-from flask_wtf.csrf import generate_csrf
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash
 from werkzeug.security import check_password_hash
 from application.models import *
 from application import app, db
+from sqlalchemy import or_, text, and_
+from sqlalchemy.exc import SQLAlchemyError
+
 
 # узнать размеры товара в наличии
 def get_size(product_id):
@@ -28,7 +30,7 @@ def increment_click(product_id):
 # страница товара
 @app.route('/product/<int:product_id>')
 def product(product_id):
-    increment_click(product_id)
+    increment_click(product_id) # вызываю функцию инкремента кликов
     # код для получения информации о товаре по его идентификатору
     product = Products.query.get(product_id)
     model = Storage.query.filter_by(item_id=product_id).all()
@@ -194,12 +196,12 @@ def dashboard():
     orders = Order.query.filter(Order.user_id == current_user.id).order_by(Order.id.desc()).all()
     return render_template('dashboard.html', orders=orders)
 
-#тут я вывожу на главную данные из бд потому что могу 
+# главная страница
 @app.route('/')
 def index():
     brands = Brands.query.all()
     categorys = Category.query.all()
-    products = Products.query.order_by(Products.click.desc()).all()
+    products = Products.query.order_by(Products.click.desc()).all() # сортировка по количеству кликов
     return render_template('index.html', brands=brands, categorys=categorys, products=products)
 
 # добавление заказа
@@ -258,19 +260,52 @@ def search():
     brands = Brands.query.all()
     categorys = Category.query.all()
     colors = Color.query.all()
-    print(query)
-    products = Products.query.order_by(Products.id).all() 
-    page = request.args.get(get_page_parameter(), type=int, default=1)
-    per_page = 10
+    products = Products.query.order_by(Products.click).all() 
     if query:
-        results = Products.query.filter((func.lower(Products.name).contains(func.lower(query))) | (func.lower(Products.brand).contains(func.lower(query))) | (func.lower(Products.category).contains(func.lower(query)))).paginate(page=page, per_page=per_page)
-        return render_template('search_results.html', results=results)
-    else:
-        return render_template('search.html', brands=brands, categorys=categorys, products=products)
-    
-    
+        results = Products.query.filter(
+            Products.name.ilike(f'%{query}%') | 
+            Products.brand.ilike(f'%{query}%') |
+            Products.category.ilike(f'%{query}%')
+        )
 
-       
+        print(str(Products.query.filter(
+            Products.name.ilike(f'%{query}%') | 
+            Products.brand.ilike(f'%{query}%') |
+            Products.category.ilike(f'%{query}%')
+        ).statement))
+        return render_template('search_results.html', results=results)
+
+    else:
+        return render_template('search.html', brands=brands, categorys=categorys, products=products, colors=colors)
+    
+# фильтрация
+@app.route('/filter')
+def filter():
+    category = request.args.get('category')
+    brand = request.args.get('brand')
+    color = request.args.get('color')
+    min_price = request.args.get('min_price')
+    max_price = request.args.get('max_price') 
+
+    filters = []
+    if category:
+       filters.append(Products.category.ilike(f'%{category}%'))
+    if brand:
+       filters.append(Products.brand.ilike(f'%{brand}%'))
+    if color:
+       filters.append(Products.color.ilike(f'%{color}%'))
+    if min_price:
+       filters.append(Products.price >= int(min_price))
+    if max_price:
+       filters.append(Products.price <= int(max_price))
+
+    if filters:
+        results = Products.query.filter(and_(*filters)).all()
+    else:
+        results = Products.query.all()
+
+    return render_template('search_results.html', results=results)
+
 
 # эта функция удаляет все записи из корзины пользователя
 def delete_cart_items():
@@ -279,7 +314,6 @@ def delete_cart_items():
 
 # #добавление товара в бд
 @app.route('/add_product', methods=['GET', 'POST'])
-
 def add_product():    
     if current_user.login == 'admin':
         # Данные для списков

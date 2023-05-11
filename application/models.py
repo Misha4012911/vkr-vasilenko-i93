@@ -28,14 +28,14 @@ class Sizes(db.Model):
     __tablename__ = 'Sizes'
     __table_args__ = {'schema': 'Market_schem'}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False, unique=True)
 
 # брэнды
 class Brands(db.Model): 
     __tablename__ = 'Brands'
     __table_args__ = {'schema': 'Market_schem'}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    name = db.Column(db.String(50), nullable=False)
+    name = db.Column(db.String(50), nullable=False )
 
 class Category(db.Model):
     __tablename__ = 'Category'

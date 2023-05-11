@@ -4,31 +4,129 @@
 
 {% block content %}
 <style> 
+#filter-form {
+  margin: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  box-shadow: 0px 5px 5px #eee;
+  border-radius: 10px;
+  background-color: #fff;
+}
+
+#filter-form label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+#filter-form select,
+#filter-form input {
+  display: block;
+  margin-bottom: 10px;
+  padding: 5px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+  font-size: 16px;
+  background-color: #f8f8f8;
+}
+
+#filter-form input[type="submit"] {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin-top: 20px;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+#filter-form input[type="submit"]:hover {
+  background-color: #3e8e41;
+}
+
+#filter-form .product-wrapper {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+#filter-form .product-card {
+  margin: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  box-shadow: 0px 5px 5px #eee;
+  overflow: hidden;
+  width: 300px;
+  background-color: #fff;
+}
+
+#filter-form .product-card img {
+  width: 100%;
+  height: auto;
+}
+
+#filter-form .product-card h2 {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 10px;
+  margin-bottom: 5px;
+  color: #333;
+}
+
+#filter-form .product-card p {
+  margin: 5px 0;
+  font-size: 16px;
+  font-weight: bold;
+  color: #333;
+}
+h1 {
+  text-align: center;
+}
 </style>
 <body>
 
   <h1>Поиск товаров</h1>
 
-  <form action="{{ url_for('search') }}" method="GET">
-    <label for="category">Категория:</label>
-    <select id="category" name="category">
-      <option value="">Все категории</option>
-      {% for category in categorys %}
+  <form id="filter-form" action="{{ url_for('filter') }}" method="GET">
+    <div>
+      <label for="category">Категория:</label>
+      <select id="category" name="category">
+        <option value="">Все категории</option>
+        {% for category in categorys %}
         <option value="{{ category.name }}">{{ category.name }}</option>
-      {% endfor %}
-    </select>
-
-    <label for="brand">Брэнд:</label>
-    <select id="brand" name="brand">
-      <option value="">Все брэнды</option>
-      {% for brand in brands %}
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="brand">Брэнд:</label>
+      <select id="brand" name="brand">
+        <option value="">Все брэнды</option>
+        {% for brand in brands %}
         <option value="{{ brand.name }}">{{ brand.name }}</option>
-      {% endfor %}
-    </select>
-
-    <button type="submit">Найти</button>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="color">Цвет:</label>
+      <select id="color" name="color">
+        <option value="">Все цвета</option>
+        {% for color in colors %}
+        <option value="{{ color.name }}">{{ color.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div>
+      <label for="min_price">Минимальная цена:</label>
+      <input type="text" id="min_price" name="min_price">
+    </div>
+    <div>
+      <label for="max_price">Максимальная цена:</label>
+      <input type="text" id="max_price" name="max_price">
+    </div>
+    <input type="submit" value="Фильтр">
   </form>
-
+    <h1>Популярные товары</h1>
 
     <div class="product-wrapper">
       {% for product in products %}
@@ -41,5 +139,18 @@
               </a>
       {% endfor %}
     </div>
+    
+    <script>
+      const searchInput = document.querySelector('#search-input');
+      searchInput.addEventListener('keyup', () => {
+          const query = searchInput.value;
+          fetch(`/search?query=${query}`)
+              .then(response => response.text())
+              .then(html => {
+                  const searchResults = document.querySelector('#search-results');
+                  searchResults.innerHTML = html;
+              });
+      });
+  </script>
 </body>
 {% endblock %}

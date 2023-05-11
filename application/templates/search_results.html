@@ -1,51 +1,28 @@
 {% extends 'base.html' %}
 
-{% block title %}Товары{% endblock %}
+{% block title %}
+    Товары
+{% endblock %}
 
 {% block content %}
-<body>
-    <h1>Результаты поиска</h1>
-    {% if results.items %}
-      <ul>
-        <div class="product-wrapper">
-        {% for product in results.items %}
-            <a href="{{ url_for('product', product_id=product.id) }}">
-            <div class="product-card">
-            <img src="{{ product.img_url }}">
-            <h2>{{ product.category }} {{ product.brand }} {{ product.name }} {{ product.color}}</h2>
-            <p>Цена: {{ product.price }} руб.</p>
-            </div>
-            </a>
-        {% endfor %}
-        </div>
-      </ul>
-      {% if results.has_pages %}
-        <div class="pagination">
-          {% if results.has_prev %}
-            <a href="{{ url_for('search', query=query, page=results.prev_num) }}">«</a>
-          {% else %}
-            <span class="disabled">«</span>
-            {% endif %}
-            {% for page_num in results.iter_pages(left_edge=1, left_current=1, right_current=2, right_edge=1) %}
-              {% if page_num %}
-                {% if page_num != results.page %}
-                  <a href="{{ url_for('search', query=query, page=page_num) }}">{{ page_num }}</a>
-                {% else %}
-                  <span class="current">{{ page_num }}</span>
-                {% endif %}
-              {% else %}
-                <span class="ellipsis">…</span>
-              {% endif %}
-            {% endfor %}
-            {% if results.has_next %}
-              <a href="{{ url_for('search', query=query, page=results.next_num) }}">»</a>
-            {% else %}
-              <span class="disabled">»</span>
-            {% endif %}
-          </div>
+    <body>
+        <h1>Результаты поиска</h1>
+        {% if results %}
+            <ul>
+                <div class="product-wrapper">
+                    {% for product in results %}
+                        <a href="{{ url_for('product', product_id=product.id) }}">
+                            <div class="product-card">
+                                <img src="{{ product.img_url }}">
+                                <h2>{{ product.category }} {{ product.brand }} {{ product.name }} {{ product.color}}</h2>
+                                <p>Цена: {{ product.price }} руб.</p>
+                            </div>
+                        </a>
+                    {% endfor %}
+                </div>
+            </ul>
+        {% else %}
+            <p>Ничего не найдено.</p>
         {% endif %}
-      {% else %}
-        <p>Ничего не найдено.</p>
-      {% endif %}
-  </body>
+    </body>
 {% endblock %}
