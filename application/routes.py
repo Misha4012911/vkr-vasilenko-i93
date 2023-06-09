@@ -1,6 +1,5 @@
-from flask import Flask, render_template, request, redirect, url_for, session, flash, jsonify, Blueprint
+from flask import Flask, render_template, request, redirect, url_for, flash, Blueprint
 from flask_login import login_user, logout_user, login_required, current_user
-from flask_paginate import Pagination, get_page_parameter
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func
 from werkzeug.security import generate_password_hash
@@ -209,7 +208,7 @@ def index():
 def add_order():
     if request.method == 'POST':
         apart = request.form['apart']
-        addres = ' '.join([request.form['addres'], 'квартира', apart])
+        address = ' '.join([request.form['address'], 'квартира', apart])
         phone = request.form['phone']
         total = total_price()
         cart= Cart.query.filter_by(user_id=current_user.id).all()
@@ -217,17 +216,11 @@ def add_order():
         # добавляем номер телефона
         update_user_phone(id=current_user.id, phone=phone)
         # Создаем объект модели Order
-        new_order = Order(user_id=current_user.id, addres=addres, order_data=datetime.now(), check_sum=total)
+        new_order = Order(user_id=current_user.id, address=address, order_data=datetime.now(), check_sum=total)
         # Добавляем объект в сессию
         db.session.add(new_order)    
         # Сохраняем изменения в базе данных
         db.session.commit()
-
-        #добавляем в заказ экземпляры модели и размера из корзины которые есть на складе 
-        # for item in cart:
-        #     storage = find_storage_id(item_id=item.product_id, size=item.size)
-        #     order_item = Order_items(order_id= new_order.id, item_id=storage)
-        #     db.session.add(order_item)
         
         return redirect(url_for('dashboard'))
     return render_template('order_form.html')

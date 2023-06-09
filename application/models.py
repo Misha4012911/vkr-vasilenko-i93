@@ -104,16 +104,15 @@ class Products(db.Model):
     description = db.Column(db.String(100000))
     img_url = db.Column(db.String(100000), unique=True)
     price = db.Column(db.Integer, nullable=False)
-    discount = db.Column(db.Integer)
     click = db.Column(db.Integer)
 
 
-# статус заказа
-class OrderStatus(db.Model):
-    __tablename__ = 'OrderStatus'
-    __table_args__ = {'schema': 'Market_schem'}
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
-    status_name = db.Column(db.String(50), nullable=False, unique=True)
+# # статус заказа
+# class Order_status(db.Model):
+#     __tablename__ = 'Order_status'
+#     __table_args__ = {'schema': 'Market_schem'}
+#     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+#     status_name = db.Column(db.String(50), nullable=False, unique=True)
 
 # заказ
 class Order(db.Model):
@@ -121,7 +120,7 @@ class Order(db.Model):
     __table_args__ = {'schema': 'Market_schem'}
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
     user_id = db.Column(db.Integer, nullable=False)
-    addres = db.Column(db.String(50), nullable=False)
+    address = db.Column(db.String(50), nullable=False)
     order_data = db.Column(db.DateTime)
     check_sum = db.Column(db.Integer)
     status_name = db.Column(db.String(50), nullable=False, default='Ожидает оплату')
